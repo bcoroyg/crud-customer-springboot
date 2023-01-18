@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -91,9 +92,24 @@ public class CustomerController {
             return new ResponseEntity<Map<String, Object>>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        response.put("message", "Usuario actulizado con exito");
+        response.put("message", "Cliente actulizado con exito");
         response.put("customer", customerEdit);
 
+        return new ResponseEntity<Map<String, Object>>(response, HttpStatus.OK);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteCustomer(@PathVariable Long id) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            service.delete(id);
+        } catch (DataAccessException e) {
+            response.put("error", e.getMessage());
+            response.put("message", "Error al obtener un cliete");
+            return new ResponseEntity<Map<String, Object>>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        response.put("message", "Cliente eliminado correctamente");
         return new ResponseEntity<Map<String, Object>>(response, HttpStatus.OK);
     }
 }
