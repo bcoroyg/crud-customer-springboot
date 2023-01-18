@@ -9,6 +9,7 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,10 +39,31 @@ public class CustomerController {
         } catch (DataAccessException e) {
             response.put("error", e.getMessage());
             response.put("message", "Error al realizar insert en la base de datos");
-            return new ResponseEntity<Map<String, Object>> (response, HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<Map<String, Object>>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
         response.put("customer", customerNew);
         response.put("message", "El cliente se ha creado con exito");
-        return new ResponseEntity<Map<String, Object>> (response, HttpStatus.CREATED);
+        return new ResponseEntity<Map<String, Object>>(response, HttpStatus.CREATED);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getCustomer(@PathVariable Long id) {
+        Customer customer = null;
+        Map<String, Object> response = new HashMap<>();
+
+        try {
+            customer = service.findById(id);
+        } catch (DataAccessException e) {
+            response.put("error", e.getMessage());
+            response.put("message", "Error al obtener un cliete");
+            return new ResponseEntity<Map<String, Object>>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        if (customer == null) {
+            response.put("message", "El cliente con ID: ".concat(id.toString()).concat(" no existe."));
+            return new ResponseEntity<Map<String, Object>>(response, HttpStatus.NOT_FOUND);
+        }
+
+        return new ResponseEntity<Customer>(customer, HttpStatus.OK);
     }
 }
